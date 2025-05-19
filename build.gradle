@@ -1,0 +1,98 @@
+plugins {
+    id 'fabric-loom' version "${fabric_loom_version}"
+    id 'maven-publish'
+}
+
+base {
+    archivesName = project.archives_base_name
+    version = project.mod_version
+    group = project.maven_group
+}
+
+loom {
+    accessWidenerPath = file('src/main/resources/deepslatecracker.aw')
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        name = 'xpple'
+        url = 'https://maven.xpple.dev/maven2'
+    }
+    maven {
+        name = 'ParchmentMC'
+        url = 'https://maven.parchmentmc.org'
+    }
+    maven {
+        name = 'DJtheRedstoner'
+        url = 'https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1'
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.layered {
+        officialMojangMappings {
+            nameSyntheticMembers = true
+        }
+        parchment "org.parchmentmc.data:${project.parchment_mappings}"
+    }
+    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+    include modImplementation("dev.xpple:clientarguments:${project.clientarguments_version}")
+    include modImplementation("dev.xpple:betterconfig-fabric:${project.betterconfig_version}")
+
+    modRuntimeOnly('me.djtheredstoner:DevAuth-fabric:1.2.1') {
+        exclude group: 'net.fabricmc', module: 'fabric-loader'
+    }
+
+    include implementation('com.microsoft:z3:1.0.0')
+
+    testImplementation platform("org.junit:junit-bom:${project.junit_version}")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+processResources {
+    def props = [version: project.mod_version, loader_version: project.fabric_loader_version]
+    filteringCharset = "UTF-8"
+
+    filesMatching("fabric.mod.json") {
+        expand props
+    }
+
+    from("LICENSE") {
+        rename {"${it}_${project.base.archivesName.get()}"}
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact file('src/main/resources/com.microsoft.z3.jar')
+            groupId = 'com.microsoft'
+            artifactId = 'z3'
+            version = '1.0.0'
+        }
+    }
+
+    repositories {
+        mavenLocal()
+    }
+}

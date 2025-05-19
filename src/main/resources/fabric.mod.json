@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "deepslatecracker",
+  "version": "${version}",
+
+  "name": "Deepslate Cracker",
+  "description": "In-game Minecraft Fabric mod that cracks the (overworld) world seed from deepslate patterns.",
+  "authors": [
+    "xpple"
+  ],
+  "contact": {
+    "homepage": "https://xpple.dev/",
+    "sources": "https://github.com/xpple/DeepslateCracker/"
+  },
+
+  "license": "LGPL-3.0-or-later",
+  "icon": "assets/deepslatecracker/icon.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.xpple.deepslatecracker.DeepslateCracker"
+    ],
+    "preLaunch": [
+      "dev.xpple.deepslatecracker.DeepslateCrackerPreLaunch"
+    ]
+  },
+  "mixins": [
+  ],
+  "accessWidener": "deepslatecracker.aw",
+
+  "depends": {
+    "java": ">=21",
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": ">=0.37.1",
+    "minecraft": ">=1.21.2 <1.22",
+    "betterconfig": "*",
+    "clientarguments": "*"
+  }
+}

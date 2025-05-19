@@ -1,0 +1,31 @@
+# Gradle
+.gradle/
+build/
+out/
+classes/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse
+.launch
+
+# VS Code
+.settings/
+.vscode/
+bin/
+.classpath
+.project
+# Mac OS
+.DS_Store
+
+# Fabric
+run/
+
+# Mod
+src/main/resources/com.microsoft.z3.jar
+
+src/main/resources/libz3*.*

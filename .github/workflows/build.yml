@@ -1,0 +1,109 @@
+name: build
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  download-z3:
+    name: Download Z3
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+
+      - name: Download Z3 (ubuntu-latest)
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: src/main/resources
+        run: |
+          wget --no-verbose https://github.com/Z3Prover/z3/releases/download/z3-4.15.0/z3-4.15.0-x64-glibc-2.39.zip
+          unzip z3-4.15.0-x64-glibc-2.39.zip
+          mv z3-4.15.0-x64-glibc-2.39/bin/libz3.so .
+          mv z3-4.15.0-x64-glibc-2.39/bin/libz3java.so .
+          mv z3-4.15.0-x64-glibc-2.39/bin/com.microsoft.z3.jar .
+      - name: Download Z3 (macos-latest)
+        if: matrix.os == 'macos-latest'
+        working-directory: src/main/resources
+        run: |
+          wget --no-verbose https://github.com/Z3Prover/z3/releases/download/z3-4.15.0/z3-4.15.0-arm64-osx-13.7.5.zip
+          wget --no-verbose https://github.com/Z3Prover/z3/releases/download/z3-4.15.0/z3-4.15.0-x64-osx-13.7.5.zip
+          unzip z3-4.15.0-arm64-osx-13.7.5.zip
+          unzip z3-4.15.0-x64-osx-13.7.5.zip
+          lipo -create -output libz3.dylib z3-4.15.0-arm64-osx-13.7.5/bin/libz3.dylib z3-4.15.0-x64-osx-13.7.5/bin/libz3.dylib
+          lipo -create -output libz3java.dylib z3-4.15.0-arm64-osx-13.7.5/bin/libz3java.dylib z3-4.15.0-x64-osx-13.7.5/bin/libz3java.dylib
+          mv z3-4.15.0-arm64-osx-13.7.5/bin/com.microsoft.z3.jar .
+      - name: Download Z3 (windows-latest)
+        if: matrix.os == 'windows-latest'
+        working-directory: src/main/resources
+        run: |
+          Invoke-WebRequest -OutFile "z3-4.15.0-x64-win.zip" https://github.com/Z3Prover/z3/releases/download/z3-4.15.0/z3-4.15.0-x64-win.zip
+          tar -xf z3-4.15.0-x64-win.zip
+          mv z3-4.15.0-x64-win/bin/libz3.dll libz3.dll
+          mv z3-4.15.0-x64-win/bin/libz3java.dll libz3java.dll
+          mv z3-4.15.0-x64-win/bin/com.microsoft.z3.jar .
+
+      - name: Capture Z3 libraries (ubuntu-latest)
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Z3 libraries (ubuntu-latest)
+          path: |
+            src/main/resources/libz3*.so
+            src/main/resources/com.microsoft.z3.jar
+      - name: Capture Z3 libraries (macos-latest)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Z3 libraries (macos-latest)
+          path: |
+            src/main/resources/libz3*.dylib
+            src/main/resources/com.microsoft.z3.jar
+      - name: Capture Z3 libraries (windows-latest)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Z3 libraries (windows-latest)
+          path: |
+            src/main/resources/libz3*.dll
+            src/main/resources/com.microsoft.z3.jar
+
+  build:
+    name: Build Deepslate Cracker Mod
+    needs: download-z3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+      - name: Capture shared library
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: src/main/resources/
+      - name: Validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+      - name: Setup JDK 23
+        uses: actions/setup-java@v4
+        with:
+          java-version: 23
+          distribution: 'temurin'
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: Publish Z3 JAR to Maven local
+        run: ./gradlew publish
+      - name: Build
+        run: ./gradlew build
+      - name: Capture build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepslateCracker
+          path: build/libs/

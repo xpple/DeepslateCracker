@@ -1,0 +1,8 @@
+{
+  "commands.deepslatecracker:crack.notInOverworld": "You must be in the overworld!",
+  "commands.deepslatecracker:crack.notLoaded": "The chunk you are in is not loaded!",
+  "commands.deepslatecracker:crack.alreadyCracking": "Already busy cracking!",
+  "commands.deepslatecracker:crack.started": "Started cracking with %s threads!",
+  "commands.deepslatecracker:crack.noSeedFound": "No seed found!",
+  "commands.deepslatecracker:crack.success": "Found seed: %s"
+}
