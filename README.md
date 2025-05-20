@@ -1,7 +1,7 @@
 Always use the latest (stable) version!
 
 # Deepslate Cracker
-Minecraft Fabric mod that cracks the (Overworld) world seed using deepslate patterns.
+Minecraft Fabric mod that cracks the (Overworld) world seed using deepslate patterns. Note that this project is mostly theoretical (an example of using Z3 in Java). The cracking itself does not complete in a time that is feasible for common usage.
 
 ## Installation
 1. Install the [Fabric Loader](https://fabricmc.net/use/).
@@ -31,7 +31,11 @@ This mod uses the [Z3 Theorem Prover](https://github.com/Z3Prover/z3) to crack t
 To build the mod locally, follow these steps:
 
 1. [Download Z3](https://github.com/Z3Prover/z3/releases) for your OS, unzip it and move the necessary files (`com.microsoft.z3.jar` and the two shared libaries `libz3` and `libz3java`) to the `src/main/resources` directory.
-2. Build the mod:
+2. Publish the Z3 JAR to Maven local:
+   ```shell
+   ./gradlew publish
+   ```
+3. Build the mod:
    ```shell
    ./gradlew build
    ```
